@@ -3,9 +3,9 @@ using StudentProject.Models;
 
 namespace StudentProject.Models
 {
-    public class StudentDbContext : DbContext
+    public class InvestorDbContext : DbContext
     {
-        public StudentDbContext(DbContextOptions<StudentDbContext> options) : base(options)
+        public InvestorDbContext(DbContextOptions<InvestorDbContext> options) : base(options)
         {
         }
         //public DbSet<Student> Student { get; set; }

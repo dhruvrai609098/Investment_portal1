@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
@@ -11,10 +12,10 @@ using StudentProject.Models;
 [ApiController]
 public class AuthController : ControllerBase
 {
-    private readonly StudentDbContext _context;
+    private readonly InvestorDbContext _context;
     private readonly IConfiguration _configuration;
 
-    public AuthController(StudentDbContext context, IConfiguration configuration)
+    public AuthController(InvestorDbContext context, IConfiguration configuration)
     {
         _context = context;
         _configuration = configuration;
@@ -25,7 +26,7 @@ public class AuthController : ControllerBase
     {
         var user = _context.UserModel.SingleOrDefault(u => u.Username == model.Username);
 
-        if (user == null || !VerifyPassword(model.Password, user.PasswordHash))
+        if (user == null || !VerifyPassword(model.Password, user.hashPassword))
         {
             return Unauthorized(); // Invalid username or password
         }
@@ -67,8 +68,9 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public IActionResult Register(RegisterRequest model)
     {
+        try { 
         // Check if a user with the same username already exists
-        if (_context.UserModel.Any(u => u.Username == model.Username))
+        if (_context.UserModel.Any(u => u.Username == model.Name))
         {
             return BadRequest("Username already exists");
         }
@@ -79,8 +81,15 @@ public class AuthController : ControllerBase
 
         var user = new UserModel
         {
-            Username = model.Username,
-            PasswordHash = model.Password // In a real application, hash the password
+            Username = model.Name,
+            gender = model.gender,
+            Email = model.Email,
+            PhoneNumber = model.PhoneNumber,
+            hashPassword = model.setPassword, // In a real application, hash the password
+
+
+
+
         };
 
         _context.UserModel.Add(user);
@@ -88,7 +97,13 @@ public class AuthController : ControllerBase
 
         // Generate and return a JWT token for the newly registered user
         var token = GenerateJwtToken(user);
-        return Ok(new { Token = token });
+        return Ok("Registration successful");
     }
-
+        catch (Exception ex)
+        {
+            return StatusCode(500, ex);
+        }
+     
+    }
 }
+

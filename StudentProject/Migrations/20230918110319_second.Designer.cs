@@ -10,7 +10,7 @@ using StudentProject.Models;
 
 namespace StudentProject.Migrations
 {
-    [DbContext(typeof(StudentDbContext))]
+    [DbContext(typeof(InvestorDbContext))]
     [Migration("20230918110319_second")]
     partial class second
     {
