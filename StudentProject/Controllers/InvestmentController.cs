@@ -28,7 +28,7 @@ public class AuthController : ControllerBase
 
         if (user == null || !VerifyPassword(model.Password, user.hashPassword))
         {
-            return Unauthorized(); // Invalid username or password
+            return Conflict(new { Message = "Invalid login credentials" });
         }
 
         var token = GenerateJwtToken(user);
@@ -70,16 +70,18 @@ public class AuthController : ControllerBase
     {
         try { 
         // Check if a user with the same username already exists
-        if (_context.UserModel.Any(u => u.Username == model.Name))
+        if (_context.UserModel.Any(u => u.Email == model.Email))
         {
-            return BadRequest("Username already exists");
-        }
+                //  return BadRequest("Username already exists");
+                return Conflict(new { Message = "User already exists" });
 
-        // You should hash the password before storing it in the database
-        // For simplicity, this example does not include actual password hashing.
-        // You should use a secure hashing algorithm in your production code.
+            }
 
-        var user = new UserModel
+            // You should hash the password before storing it in the database
+            // For simplicity, this example does not include actual password hashing.
+            // You should use a secure hashing algorithm in your production code.
+
+            var user = new UserModel
         {
             Username = model.Name,
             gender = model.gender,
@@ -97,8 +99,8 @@ public class AuthController : ControllerBase
 
         // Generate and return a JWT token for the newly registered user
         var token = GenerateJwtToken(user);
-        return Ok("Registration successful");
-    }
+            return Ok(new { Message = "Registration successful", User = user });
+        }
         catch (Exception ex)
         {
             return StatusCode(500, ex);
